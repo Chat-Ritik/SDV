@@ -75,6 +75,14 @@ nbsphinx_prolog = """
     </style>
 """
 
+# New docs location warning
+rst_prolog = """
+    .. danger:: You are looking at the documentation for an older version of the SDV! We are no
+        longer supporting or maintaining this version of the software
+
+        `Click here to go to the new docs pages. <https://docs.sdv.dev/sdv/>`_
+"""
+
 # General information about the project.
 project = 'SDV'
 slug = 'sdv'
