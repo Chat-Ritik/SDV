@@ -425,7 +425,6 @@ def test_use_own_data_using_hma(tmp_path):
         sdtype='datetime',
         datetime_format='%d %b %Y'
     )
-
     metadata.update_column(
         table_name='guests',
         column_name='checkout_date',
@@ -438,7 +437,6 @@ def test_use_own_data_using_hma(tmp_path):
         sdtype='text',
         regex_format='HID_[0-9]{3,4}'
     )
-
     metadata.update_column(
         table_name='guests',
         column_name='hotel_id',
@@ -451,14 +449,12 @@ def test_use_own_data_using_hma(tmp_path):
         sdtype='email',
         pii=True
     )
-
     metadata.update_column(
         table_name='guests',
         column_name='billing_address',
         sdtype='address',
         pii=True
     )
-
     metadata.update_column(
         table_name='guests',
         column_name='credit_card_number',
@@ -469,7 +465,6 @@ def test_use_own_data_using_hma(tmp_path):
         table_name='hotels',
         column_name='hotel_id'
     )
-
     metadata.set_primary_key(
         table_name='guests',
         column_name='guest_email'
