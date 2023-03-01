@@ -1,38 +1,14 @@
-import pandas as pd
-from sdv.datasets.demo import download_demo
-from sdv.evaluation.single_table import get_column_pair_plot
-from sdv.constraints import create_custom_constraint_class
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
+import pandas as pd
+
+from sdv.datasets.demo import download_demo
 from sdv.single_table import GaussianCopulaSynthesizer
 
 
-def is_valid(column_names, data):
-    boolean_column = column_names[0]
-    numerical_column = column_names[1]
-    true_values = (data[boolean_column] == True) & (data[numerical_column] == 0.0)
-    false_values = (data[boolean_column] == False)
-
-    return (true_values) | (false_values)
-
-
-def transform(column_names, data):
-    boolean_column = column_names[0]
-    numerical_column = column_names[1]
-    typical_value = data[numerical_column].median()
-    data[numerical_column] = data[numerical_column].mask(data[boolean_column] == True, typical_value)
-
-    return data
-
-
-def reverse_transform(column_names, data):
-    boolean_column = column_names[0]
-    numerical_column = column_names[1]
-    data[numerical_column] = data[numerical_column].mask(data[boolean_column] == True, 0.0)
-
-    return data
-
-
 def test_adding_constraints():
+    """End to end test for the ``SDV (Advanced): Adding Constraints.ipynb``."""
     # Setup
     real_data, metadata = download_demo(
         modality='single_table',
@@ -48,7 +24,7 @@ def test_adding_constraints():
     }
     synthesizer = GaussianCopulaSynthesizer(metadata)
 
-    # Run
+    # Run
     synthesizer.add_constraints([checkin_lessthan_checkout])
     synthesizer.fit(real_data)
 
@@ -57,9 +33,9 @@ def test_adding_constraints():
     synthetic_dates = synthetic_data_constrained[['checkin_date', 'checkout_date']].dropna()
     checkin_dates = pd.to_datetime(synthetic_dates['checkin_date'])
     checkout_dates = pd.to_datetime(synthetic_dates['checkout_date'])
-    violations =  checkin_dates >= checkout_dates
+    violations = checkin_dates >= checkout_dates
 
-    assert all(violations)
+    assert all(~violations)
 
     # Load custom constraint class
     synthesizer.load_custom_constraint_classes(
@@ -81,7 +57,7 @@ def test_adding_constraints():
     synthesizer.fit(real_data)
     synthetic_data_custom_constraint = synthesizer.sample(500)
 
-    # Assert
+    # Assert
     validation = synthetic_data_custom_constraint[synthetic_data_custom_constraint['has_rewards']]
     assert validation['amenities_fee'].sum() == 0.0
 
@@ -98,6 +74,6 @@ def test_adding_constraints():
     assert isinstance(loaded_synthesizer, GaussianCopulaSynthesizer)
     assert loaded_synthesizer.get_info() == synthesizer.get_info()
     assert loaded_synthesizer.metadata.to_dict() == metadata.to_dict()
-    sampled_data = loaded_synthesizer.sample()
+    sampled_data = loaded_synthesizer.sample(100)
     validation = sampled_data[sampled_data['has_rewards']]
     assert validation['amenities_fee'].sum() == 0.0
