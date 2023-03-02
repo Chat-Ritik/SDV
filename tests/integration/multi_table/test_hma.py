@@ -520,6 +520,7 @@ def test_use_own_data_using_hma(tmp_path):
     synthesizer.validate(datasets)
     synthesizer.fit(datasets)
     synthetic_data = synthesizer.sample(scale=1)
+    synthesizer.validate(synthetic_data)
 
     for table in metadata.tables:
         assert set(synthetic_data[table].columns) == set(datasets[table].columns)
