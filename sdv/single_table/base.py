@@ -10,8 +10,8 @@ import uuid
 import warnings
 from collections import defaultdict
 
-import cloudpickle
 import copulas
+import dill
 import numpy as np
 import pandas as pd
 import pkg_resources
@@ -1074,7 +1074,7 @@ class BaseSingleTableSynthesizer(BaseSynthesizer):
                 Path where the synthesizer instance will be serialized.
         """
         with open(filepath, 'wb') as output:
-            cloudpickle.dump(self, output)
+            dill.dump(self, output)
 
     @classmethod
     def load(cls, filepath):
@@ -1089,5 +1089,5 @@ class BaseSingleTableSynthesizer(BaseSynthesizer):
                 The loaded synthesizer.
         """
         with open(filepath, 'rb') as f:
-            model = cloudpickle.load(f)
+            model = dill.load(f)
             return model
