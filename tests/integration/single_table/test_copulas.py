@@ -8,7 +8,15 @@ from sdv.single_table import GaussianCopulaSynthesizer
 
 
 def test_adding_constraints():
-    """End to end test for the ``SDV (Advanced): Adding Constraints.ipynb``."""
+    """End to end test for adding constraints to a ``BaseSingleTableSynthesizer``.
+
+    The following functionalities are being tested:
+        * Use an ``Inequality`` constraint.
+        * Load custom constraint class from a file.
+        * Add a custom constraint class to the model.
+        * Validate that the custom constraint was applied properly.
+        * Save, load and sample from the model storing both custom and pre-defined constraints.
+    """
     # Setup
     real_data, metadata = download_demo(
         modality='single_table',
@@ -27,14 +35,13 @@ def test_adding_constraints():
     # Run
     synthesizer.add_constraints([checkin_lessthan_checkout])
     synthesizer.fit(real_data)
-
     synthetic_data_constrained = synthesizer.sample(500)
 
+    # Assert
     synthetic_dates = synthetic_data_constrained[['checkin_date', 'checkout_date']].dropna()
     checkin_dates = pd.to_datetime(synthetic_dates['checkin_date'])
     checkout_dates = pd.to_datetime(synthetic_dates['checkout_date'])
     violations = checkin_dates >= checkout_dates
-
     assert all(~violations)
 
     # Load custom constraint class
@@ -48,10 +55,7 @@ def test_adding_constraints():
             'column_names': ['has_rewards', 'amenities_fee']
         }
     }
-
-    synthesizer.add_constraints([
-        rewards_member_no_fee
-    ])
+    synthesizer.add_constraints([rewards_member_no_fee])
 
     # Re-Fit the model
     synthesizer.fit(real_data)
