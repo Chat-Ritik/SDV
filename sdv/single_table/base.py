@@ -1067,7 +1067,7 @@ class BaseSingleTableSynthesizer(BaseSynthesizer):
         )
 
     def save(self, filepath):
-        """Save this model instance to the given path using cloudpickle.
+        """Save this model instance to the given path using dill.
 
         Args:
             filepath (str):

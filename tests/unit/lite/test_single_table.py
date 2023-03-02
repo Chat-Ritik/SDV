@@ -2,7 +2,7 @@ import io
 from tempfile import TemporaryDirectory
 from unittest.mock import MagicMock, Mock, mock_open, patch
 
-import cloudpickle
+import dill
 import numpy as np
 import pandas as pd
 import pytest
@@ -233,14 +233,14 @@ class TestTabularPreset:
         # Assert
         assert out.getvalue().strip() == expected
 
-    @patch('sdv.lite.single_table.cloudpickle')
-    def test_save(self, cloudpickle_mock):
+    @patch('sdv.lite.single_table.dill')
+    def test_save(self, dill_mock):
         """Test that the synthesizer's save method is called with the expected args."""
         # Setup
         synthesizer = Mock()
         preset = Mock()
         preset._synthesizer = synthesizer
-        open_mock = mock_open(read_data=cloudpickle.dumps('test'))
+        open_mock = mock_open(read_data=dill.dumps('test'))
 
         # Run
         with TemporaryDirectory() as temp_dir:
@@ -249,15 +249,15 @@ class TestTabularPreset:
 
         # Assert
         open_mock.assert_called_once_with(temp_dir, 'wb')
-        cloudpickle_mock.dump.assert_called_once_with(preset, open_mock())
+        dill_mock.dump.assert_called_once_with(preset, open_mock())
 
-    @patch('sdv.lite.single_table.cloudpickle')
-    def test_load(self, cloudpickle_mock):
+    @patch('sdv.lite.single_table.dill')
+    def test_load(self, dill_mock):
         """Test that the synthesizer's load method is called with the expected args."""
         # Setup
         default_synthesizer = Mock()
         SingleTablePreset._default_synthesizer = default_synthesizer
-        open_mock = mock_open(read_data=cloudpickle.dumps('test'))
+        open_mock = mock_open(read_data=dill.dumps('test'))
 
         # Run
         with patch('sdv.lite.single_table.open', open_mock):
@@ -265,7 +265,7 @@ class TestTabularPreset:
 
         # Assert
         open_mock.assert_called_once_with('test-file.pkl', 'rb')
-        assert loaded == cloudpickle_mock.load.return_value
+        assert loaded == dill_mock.load.return_value
 
     def test___repr__(self):
         """Test that a string of format 'SingleTablePreset(name=<name>)' is returned"""
